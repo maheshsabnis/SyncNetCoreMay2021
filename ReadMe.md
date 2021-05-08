@@ -98,5 +98,11 @@
 
 
 
- 
+# Hands-On
+
+# Date 08-05-2021
+- Create ProductSrevice for CRUD Operations and Product API
+- Create a API that will return App Products by category Name
+- Create a API that will accept Category Adn Products Records in a Single POST request and add in Database
+
 
