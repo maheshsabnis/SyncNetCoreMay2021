@@ -19,12 +19,14 @@ namespace Core_WebApp.Controllers
 			_catService = catService;
 		}
 		[HttpGet]
+		 
 		public async Task<IActionResult> Get()
 		{
 			var result = await _catService.GetAsync();
 			return Ok(result);
 		}
 		[HttpGet("{id}")]
+		[ActionName("GetDataById")]
 		public async Task<IActionResult> Get(int id)
 		{
 			var result = await _catService.GetAsync(id);
@@ -36,23 +38,26 @@ namespace Core_WebApp.Controllers
 		/// <param name="category"></param>
 		/// <returns></returns>
 		[HttpPost]
+		 
 		public async Task<IActionResult> Post(Category category)
 		{
-			try
-			{
+			//try
+			//{
+				if (category.BasePrice < 0) throw new Exception("Base Price Cannot be -ve");
 				if (ModelState.IsValid)
 				{
 					var result = await _catService.CreateAsync(category);
 					return Ok(result);
 				}
 				return BadRequest(ModelState);
-			}
-			catch (Exception ex)
-			{
-				return BadRequest($"Some Error Occured in Post {ex.Message}");
-			}
+			//}
+			//catch (Exception ex)
+			//{
+			//	return BadRequest($"Some Error Occured in Post {ex.Message}");
+			//}
 		}
 		[HttpPut("{id}")]
+		 
 		public async Task<IActionResult> Put(int id, Category category)
 		{
 			try
@@ -70,6 +75,7 @@ namespace Core_WebApp.Controllers
 			}
 		}
 		[HttpDelete("{id}")]
+		 
 		public async Task<IActionResult> Delete(int id)
 		{
 			var result = await _catService.DeleteAsync(id);

@@ -17,6 +17,7 @@ namespace Core_WebApp.Models
 		[StringLength(200)]
 		public string CategoryName { get; set; }
 		[Required(ErrorMessage = "Base Price is must")]
+		//[NumericNonNegative(ErrorMessage ="Value canno ne -ve")]
 		public int BasePrice { get; set; }
 		public ICollection<Product> Products { get; set; } // One-To-Many Relation
 	}
@@ -41,5 +42,26 @@ namespace Core_WebApp.Models
 		 
 		public int CategoryRowId { get; set; } // Expected Foreign Key
 		public Category Category { get; set; }
+	}
+
+
+	/// <summary>
+	/// Cusotm Annotation Validator class to execute server-side validations
+	/// </summary>
+	public class NumericNonNegativeAttribute : ValidationAttribute
+	{
+		/// <summary>
+		///  The 'value' is the valuen of the proeprty on which this is applied
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public override bool IsValid(object value)
+		{
+			if (Convert.ToInt32(value) < 0) 
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 }

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core_WebApp.Models;
 using Core_WebApp.Services;
+using Core_WebApp.CsutomMiddleware;
 
 namespace Core_WebApp
 {
@@ -48,6 +49,21 @@ namespace Core_WebApp
 			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+
+			// defining the CORS policy
+			services.AddCors(options=> {
+				options.AddPolicy("CORSPolicy",policy=> {
+					policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+				});
+			});
+
+			// adding Swagger Services
+			services.AddSwaggerGen(s=> {
+				s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title="ASP.NET Core API", Version="v1"});
+			});
+
+
+
 			// Custom and Addon Service Registration
 			services.AddScoped<IService<Category, int>, CategoryService>();
 
@@ -57,7 +73,7 @@ namespace Core_WebApp
 					.AddJsonOptions(option=> {
 						option.JsonSerializerOptions.PropertyNamingPolicy = null;
 					}); // api
-		//	services.AddControllersWithViews(); // MVC Views and API
+		 	services.AddControllersWithViews(); // MVC Views and API
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,11 +102,29 @@ namespace Core_WebApp
 
 			app.UseRouting();
 
+			// Apply CORS
+			app.UseCors("CORSPolicy");
+
+			// Adding the Swagger Middleware with Endpoint Metadata and UI
+			app.UseSwagger();
+			app.UseSwaggerUI(sw=> {
+				sw.SwaggerEndpoint("/swagger/v1/swagger.json", "WEB API TEST Documentstion ");
+			});
+
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+			// Use the Custom Middleware
+			app.UseErrorMiddleware();
+
+
 			app.UseEndpoints(endpoints =>
 			{
+				// define the Mapper with MVC COntroller Request Processing
+				endpoints.MapControllerRoute(
+					  name:"default",
+					  pattern:"{controller=Home}/{action=Index}/{id?}"
+					);
 				endpoints.MapRazorPages();
 				endpoints.MapControllers(); // Mapping the EndPoint for API Controllers
 			});
