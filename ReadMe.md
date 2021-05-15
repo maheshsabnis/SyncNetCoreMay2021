@@ -155,3 +155,7 @@
 - Experience the FromForm, FromQuery and FromRoute for Various ways of Posting Data to APIn Post methods
 
 
+# Hands-On
+# Date 15:May-2021
+1. Implement the Role Based Security for API along withn the Token. The Payload of the Tokne will carry the Role and UserId. 
+	The API must provide an access of REST Methods based on the Role Policies 
