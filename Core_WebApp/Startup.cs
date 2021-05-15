@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using Core_WebApp.Models;
 using Core_WebApp.Services;
 using Core_WebApp.CsutomMiddleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Core_WebApp
 {
@@ -46,8 +48,34 @@ namespace Core_WebApp
 				options.UseSqlServer(Configuration.GetConnectionString("SyncAppDbContext"));
 			});
 
-			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 				.AddEntityFrameworkStores<ApplicationDbContext>();
+
+			// read the secret key from the appSettinhs
+			byte[] secretKey = Convert.FromBase64String(Configuration["JWTSettings:SecretKey"]);
+
+			// configure the Authentication Srevice for JWT 
+			services.AddAuthentication(options=> 
+			{
+				// the server must verify the user for Authentication using Tokens
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}) // token validation
+				.AddJwtBearer(token=> {
+					token.RequireHttpsMetadata = false;
+					token.SaveToken = true;
+					token.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+					{
+
+						ValidateIssuerSigningKey = true,
+						IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+						ValidateIssuer = false,
+						ValidateAudience = false
+					}; 
+				});
+
+
+
 
 
 			// defining the CORS policy
@@ -66,6 +94,10 @@ namespace Core_WebApp
 
 			// Custom and Addon Service Registration
 			services.AddScoped<IService<Category, int>, CategoryService>();
+
+			// registering the AuthService
+
+			services.AddScoped<AuthService>();
 
 			// ASP.NET Core ECoSystem Service Registration
 			services.AddRazorPages();

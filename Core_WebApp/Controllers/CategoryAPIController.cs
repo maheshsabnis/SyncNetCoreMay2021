@@ -1,5 +1,6 @@
 ﻿using Core_WebApp.Models;
 using Core_WebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core_WebApp.Controllers
 {
+	[Authorize]
 	[Route("api/[controller]")]
 	 [ApiController]
 	public class CategoryAPIController : ControllerBase
@@ -26,7 +28,7 @@ namespace Core_WebApp.Controllers
 			return Ok(result);
 		}
 		[HttpGet("{id}")]
-		[ActionName("GetDataById")]
+	 
 		public async Task<IActionResult> Get(int id)
 		{
 			var result = await _catService.GetAsync(id);
